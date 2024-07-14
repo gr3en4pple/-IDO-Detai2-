@@ -23,7 +23,7 @@ const IdoInformation = () => {
   const raisingToken = useToken(raisingTokenAddress)
 
   return (
-    <div className="flex items-start gap-10 mt-5">
+    <div className="flex items-start gap-6 mt-5">
       <div className="w-1/2 overflow-hidden border rounded-lg">
         <div className="px-2 py-3 font-semibold text-white bg-primary-500">
           Pool Information

@@ -2,6 +2,7 @@ import {
   useAccount,
   useReadContract,
   useReadContracts,
+  useTransactionReceipt,
   useWriteContract
 } from 'wagmi'
 import { IDO as IDOAbi } from '@/contracts/abis'
@@ -37,8 +38,15 @@ const IDOContracts = {
 }
 
 const useWriteIDOContract = () => {
-  const { isPending, writeContractAsync, isIdle, variables, isSuccess, data } =
-    useWriteContract()
+  const { isPending, writeContractAsync, data: txHash } = useWriteContract()
+
+  const txReceipt = useTransactionReceipt({
+    hash: txHash,
+    query: {
+      enabled: Boolean(txHash)
+    }
+  })
+  const isFetchingTxReceipt = txReceipt.fetchStatus === 'fetching'
 
   const writeIdoContract = async (args, fnName) => {
     return await writeContractAsync({
@@ -47,7 +55,11 @@ const useWriteIDOContract = () => {
       args: [...args]
     })
   }
-  return { writeIdoContract, isPending, variables, isSuccess, data }
+  return {
+    writeIdoContract,
+    isLoading: isPending || isFetchingTxReceipt,
+    txReceipt
+  }
 }
 
 const useIdoContractInfo = () => {

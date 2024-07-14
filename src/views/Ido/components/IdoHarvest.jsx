@@ -1,43 +1,88 @@
 import { IDO_HARVEST_PERIODS } from '@/const'
-import { useReadIdoHarvestPerPeriod } from '@/hooks/useIdo'
+import { useReadIdoHarvestPerPeriod, useWriteIDOContract } from '@/hooks/useIdo'
 import { formatNumber } from '@/utils'
 import Countdown from '@/views/Home/components/Countdown'
+import { queryClient } from '@/Web3Provider'
 import { Button, ButtonGroup } from '@nextui-org/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { formatEther } from 'viem'
+
+const HarvestButton = ({
+  phaseNumber,
+  harvestAmount,
+  harvestTimestamp,
+  isHarvested
+}) => {
+  const [isHarvestAble, setHarvestAble] = useState(false)
+
+  const { isLoading, writeIdoContract, txReceipt } = useWriteIDOContract()
+
+  useEffect(() => {
+    if (txReceipt?.data && txReceipt?.data?.status === 'success') {
+      queryClient.invalidateQueries()
+      toast.success(
+        ` You have harvested ${formatNumber(formatEther(harvestAmount), 5)} ETHV
+          successfully`,
+
+        {
+          position: 'top-center',
+          className: 'text-base space-x-3'
+        }
+      )
+    }
+  }, [txReceipt.data, harvestAmount])
+
+  const onHarvest = async (e) => {
+    try {
+      const res = await writeIdoContract([phaseNumber], 'harvest')
+      console.log('res:', res)
+    } catch (error) {}
+  }
+
+  return (
+    <Button
+      isDisabled={isHarvested || !isHarvestAble}
+      isLoading={isLoading}
+      color="primary"
+      className="flex flex-col gap-0 space-y-0"
+      onClick={onHarvest}
+    >
+      <div>Phase {phaseNumber + 1}</div>
+      {!isLoading && (
+        <div>
+          {!isHarvestAble ? (
+            <>
+              Harvest in{' '}
+              <Countdown
+                onEnded={() => setHarvestAble(true)}
+                endTime={+harvestTimestamp?.toString()}
+              />
+            </>
+          ) : (
+            `${formatNumber(formatEther(harvestAmount), 5)} ETHV`
+          )}
+        </div>
+      )}
+    </Button>
+  )
+}
+
 const IdoHarvest = () => {
   const idoHarvestInfoPeriods = useReadIdoHarvestPerPeriod()
+
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
       {idoHarvestInfoPeriods?.length
         ? idoHarvestInfoPeriods?.map((period, index) => {
-            const isHarvestAble =
-              +period?.harvestTimestamp?.toString() <
-              new Date().getTime() / 1000
             return (
-              <Button
-                isDisabled={period?.isHarvested || !isHarvestAble}
+              <HarvestButton
                 key={index}
-                color="primary"
-                className="flex flex-col gap-0 space-y-0"
-              >
-                <div>Phase {index + 1}</div>
-                <div>
-                  {!isHarvestAble ? (
-                    <>
-                      Harvest in{' '}
-                      <Countdown
-                        endTime={+period?.harvestTimestamp?.toString()}
-                      />
-                    </>
-                  ) : (
-                    `${formatNumber(
-                      formatEther(period?.harvestAmount),
-                      5
-                    )} ETHV`
-                  )}
-                </div>
-              </Button>
+                phaseNumber={index}
+                harvestAmount={period?.harvestAmount}
+                harvestTimestamp={period?.harvestTimestamp}
+                isHarvested={period?.isHarvested}
+              />
             )
           })
         : null}

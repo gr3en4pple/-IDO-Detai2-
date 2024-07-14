@@ -6,7 +6,7 @@ import { ConnectKitProvider, getDefaultConfig } from 'connectkit'
 export const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [bscTestnet],
+    chains: [bscTestnet, sepolia, mainnet],
     transports: {
       [bscTestnet.id]: http()
     },
@@ -24,9 +24,14 @@ export const config = createConfig(
   })
 )
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false
+    }
+  }
+})
 const Web3Provider = ({ children }) => {
-
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>

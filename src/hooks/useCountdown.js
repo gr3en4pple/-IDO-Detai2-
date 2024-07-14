@@ -7,15 +7,27 @@ const useCountdown = (targetDate) => {
     countDownDate - new Date().getTime()
   )
 
+  const [isEnded, setEnded] = useState(false)
+
   useEffect(() => {
     const interval = setInterval(() => {
+
+      if (countDownDate - new Date().getTime() <= 0) {
+        clearInterval(interval)
+        setEnded(true)
+        return
+      }
+
       setCountDown(countDownDate - new Date().getTime())
     }, 1000)
 
     return () => clearInterval(interval)
   }, [countDownDate])
 
-  return getReturnValues(countDown)
+  return {
+    ...getReturnValues(countDown),
+    isEnded
+  }
 }
 
 export const getReturnValues = (countDown) => {

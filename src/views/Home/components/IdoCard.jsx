@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom'
 import { Tooltip } from '@nextui-org/react'
 import { useCountdown } from '@/hooks/useCountdown'
 import IdoCountdown from './Countdown'
-import classNames from '@/utils/classnames'
 import { formatEther } from 'viem'
 
 const CommunityIcon = ({ size = 24 }) => (
@@ -33,6 +32,7 @@ const IdoCard = ({ idoInfo, isLoading }) => {
   const startTime = +idoInfo?.startTime?.result?.toString() || 0
   const endTime = +idoInfo?.endTime?.result?.toString() || 0
   const isIdoStarted = startTime < new Date().getTime() / 1000
+  const isIdoEnded = endTime < new Date().getTime() / 1000
 
   const totalAmount = idoInfo?.totalAmount?.result?.toString() || 0
   const raisingAmount = idoInfo?.raisingAmount?.result?.toString() || 0
@@ -105,15 +105,25 @@ const IdoCard = ({ idoInfo, isLoading }) => {
           <div className="flex items-center justify-between mt-6">
             <div>
               <Chip
-                color={isIdoStarted ? 'primary' : 'default'}
+                color={
+                  isIdoEnded ? 'default' : isIdoStarted ? 'primary' : 'default'
+                }
                 size="lg"
                 startContent={
-                  <span>{isIdoStarted ? 'Ends in' : 'Starts in'}:</span>
+                  !isIdoEnded && (
+                    <span>{isIdoStarted ? 'Ends in' : 'Starts in'}:</span>
+                  )
                 }
               >
-                {startTime && endTime && (
-                  <IdoCountdown endTime={isIdoStarted ? endTime : startTime} />
-                )}
+                {startTime &&
+                  endTime &&
+                  (isIdoEnded ? (
+                    'Ended'
+                  ) : (
+                    <IdoCountdown
+                      endTime={isIdoStarted ? endTime : startTime}
+                    />
+                  ))}
               </Chip>
             </div>
 

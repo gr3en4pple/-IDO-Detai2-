@@ -16,19 +16,21 @@ const MainCard = () => {
 
   const [idoPhase, setIdoPhase] = useState(IDOPhase.NOT_STARTED)
 
-  const { isConnected } = useAccount()
+  const { isConnected, chainId } = useAccount()
 
   const totalAmount = progressInfo?.totalAmount?.result?.toString() || 0
   const raisingAmount = progressInfo?.raisingAmount?.result?.toString() || 0
   const startTime = +progressInfo?.startTime?.result?.toString() || 0
   const endTime = +progressInfo?.endTime?.result?.toString() || 0
   const isIdoStarted = startTime < new Date().getTime() / 1000
+  const isIdoEnded = endTime < new Date().getTime() / 1000
 
   useEffect(() => {
-    if (isIdoStarted && !isLoading) {
-      setIdoPhase(IDOPhase.STARTED)
+    if (!isLoading) {
+      if (isIdoStarted) setIdoPhase(IDOPhase.STARTED)
+      if (isIdoEnded) setIdoPhase(IDOPhase.ENDED)
     }
-  }, [isIdoStarted, isLoading])
+  }, [isIdoStarted, isIdoEnded, isLoading])
 
   const token = useToken(addresses.VNDT)
 
@@ -61,17 +63,17 @@ const MainCard = () => {
               </p>
             </div>
 
-            {!isLoading && idoPhase !== IDOPhase.ENDED && (
+            {/* {!isLoading && idoPhase !== IDOPhase.ENDED && ( */}
               <IdoTimeProgress
                 endTime={endTime}
                 startTime={startTime}
                 onCountdownCompleteHandler={onCountdownCompleteHandler}
                 idoPhase={idoPhase}
               />
-            )}
+            {/* // )} */}
 
             {!isLoading &&
-              (isIdoStarted ? (
+              (idoPhase !== IDOPhase.NOT_STARTED ? (
                 <IdoProgress
                   totalAmount={totalAmount}
                   raisingAmount={raisingAmount}
@@ -103,13 +105,20 @@ const MainCard = () => {
                   fullWidth
                 />
               )}
-              {isConnected && (
-                <IdoDeposit
-                  leftOverAmount={leftOverAmount}
-                  symbol={token?.symbol}
-                  idoPhase={idoPhase}
-                />
-              )}
+              {isConnected &&
+                (chainId !== 97 ? (
+                  <ConnectWalletButton
+                    useLoadingState={false}
+                    color="primary"
+                    fullWidth
+                  />
+                ) : (
+                  <IdoDeposit
+                    leftOverAmount={leftOverAmount}
+                    symbol={token?.symbol}
+                    idoPhase={idoPhase}
+                  />
+                ))}
             </div>
           </div>
         </div>

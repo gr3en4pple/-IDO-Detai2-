@@ -8,44 +8,34 @@ import { parseEther, formatEther } from 'viem'
 import IdoHarvest from './IdoHarvest'
 import { IDOPhase } from '@/const'
 import { queryClient } from '@/Web3Provider'
-import { useTransactionReceipt } from 'wagmi'
 import { toast } from 'sonner'
 
 const IdoDeposit = ({ symbol, leftOverAmount, idoPhase }) => {
+  const { writeIdoContract, isLoading, txReceipt } = useWriteIDOContract()
+  const personalInfo = useReadIdoPersonalInfo()
+
   const [amount, setAmount] = useState('')
   const amountRef = useRef(amount)
   amountRef.current = amount
-  const {
-    writeIdoContract,
-    isPending,
-    isSuccess,
-    data: txHash
-  } = useWriteIDOContract()
-
-  const result = useTransactionReceipt({
-    hash: txHash,
-    query: {
-      enabled: Boolean(txHash)
-    }
-  })
-  console.log('result:', result)
 
   useEffect(() => {
-    if (result?.data && result?.data?.status === 'success') {
+    if (txReceipt?.data && txReceipt?.data?.status === 'success') {
       queryClient.invalidateQueries()
       toast.success(
-        `You have deposited ${formatNumber(
-          amountRef.current
-        )} VNDT successfully`
+        ` You have deposited ${formatNumber(amountRef.current)} VNDT
+          successfully`,
+
+        {
+          position: 'top-center',
+          className: 'text-base space-x-3'
+        }
       )
       setAmount('')
     }
-  }, [result?.data, queryClient])
+  }, [txReceipt?.data, queryClient])
 
   const isIdoStarted = idoPhase === IDOPhase.STARTED
   const isIdoEnded = idoPhase === IDOPhase.ENDED
-
-  const personalInfo = useReadIdoPersonalInfo()
 
   // so luong da deposit
   const depositedAmount = personalInfo?.userInfo?.result?.toString() || 0
@@ -62,6 +52,8 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase }) => {
   //   personalInfo?.getOfferingAmount?.result?.toString() || 0
 
   const balance = useTokenBalance(addresses.VNDT)
+  const offeringTokenBalance = useTokenBalance(addresses.ETHV)
+  console.log('offeringTokenBalance:', offeringTokenBalance)
 
   const maxAmount = Math.min(+balance, +leftOverAmount)
 
@@ -106,12 +98,20 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase }) => {
           </div>
         </div>
         {isIdoEnded ? (
-          <IdoHarvest />
+          <div className="space-y-4 ">
+            <IdoHarvest />
+            <div className="flex items-center space-x-1 ">
+              <span>ETHV balance:</span>
+              <span className="text-sm font-medium text-default-500">
+                {formatNumber(offeringTokenBalance)} ETHV
+              </span>
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             <Input
-              pattern="^-?[0-9]\d*\.?\d*$"
-              isDisabled={!isIdoStarted}
+              pattern="^-?[0-9]\d*\d*$"
+              isDisabled={!isIdoStarted || isLoading}
               placeholder="Input your deposit amount"
               label={`Deposit ${symbol}`}
               value={amount}
@@ -130,7 +130,7 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase }) => {
             />
 
             <Button
-              isLoading={isPending}
+              isLoading={isLoading}
               isDisabled={!amount || +amount > +balance || +amount > maxAmount}
               onClick={onDepositHandler}
               color="primary"
