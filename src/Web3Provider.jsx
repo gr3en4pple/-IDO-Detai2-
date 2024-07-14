@@ -1,12 +1,15 @@
-import { WagmiProvider, createConfig } from 'wagmi'
-import { mainnet, sepolia } from 'wagmi/chains'
+import { WagmiProvider, createConfig, http } from 'wagmi'
+import { mainnet, sepolia, bscTestnet } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConnectKitProvider, getDefaultConfig } from 'connectkit'
 
-const config = createConfig(
+export const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [mainnet, sepolia],
+    chains: [bscTestnet],
+    transports: {
+      [bscTestnet.id]: http()
+    },
 
     // Required API Keys
     walletConnectProjectId: '8d81e8675217a1fa18c89a1bba5ff4ed',
@@ -21,9 +24,9 @@ const config = createConfig(
   })
 )
 
-const queryClient = new QueryClient()
-
+export const queryClient = new QueryClient()
 const Web3Provider = ({ children }) => {
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
