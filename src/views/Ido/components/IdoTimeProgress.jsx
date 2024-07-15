@@ -87,8 +87,8 @@ const IdoTimeProgress = ({
         className={classNames(
           'mt-4 text-xl font-semibold text-center  text-red-500',
           {
+            'text-yellow-200': progress.current >= 25,
             'text-primary': progress.current >= 50,
-            'text-yellow-200': progress.current >= 25
           }
         )}
       >

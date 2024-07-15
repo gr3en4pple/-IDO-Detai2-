@@ -165,15 +165,18 @@ const useReadIdoHarvestPerPeriod = () => {
     ]
   })
 
-  return dataRead.isLoading
-    ? []
-    : IDO_HARVEST_PERIODS.map((period) => ({
-        harvestAmount: dataRead.data[period]?.result,
-        harvestTimestamp:
-          dataRead.data[period + IDO_HARVEST_PERIODS.length]?.result,
-        isHarvested:
-          dataRead.data[period + IDO_HARVEST_PERIODS.length * 2]?.result
-      }))
+  return {
+    isLoading: dataRead.isLoading,
+    data: dataRead.isLoading
+      ? []
+      : IDO_HARVEST_PERIODS.map((period) => ({
+          harvestAmount: dataRead.data[period]?.result,
+          harvestTimestamp:
+            dataRead.data[period + IDO_HARVEST_PERIODS.length]?.result,
+          isHarvested:
+            dataRead.data[period + IDO_HARVEST_PERIODS.length * 2]?.result
+        }))
+  }
 }
 
 export {

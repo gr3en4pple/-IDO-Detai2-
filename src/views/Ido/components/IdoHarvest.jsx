@@ -22,7 +22,7 @@ const HarvestButton = ({
     if (txReceipt?.data && txReceipt?.data?.status === 'success') {
       queryClient.invalidateQueries()
       toast.success(
-        ` You have harvested ${formatNumber(formatEther(harvestAmount), 5)} ETHV
+        ` You have harvested ${formatNumber(formatEther(harvestAmount), 5)} STRK
           successfully`,
 
         {
@@ -48,7 +48,7 @@ const HarvestButton = ({
       className="flex flex-col gap-0 space-y-0"
       onClick={onHarvest}
     >
-      <div>Phase {phaseNumber + 1}</div>
+      {!isHarvested && <div>Phase {phaseNumber + 1}</div>}
       {!isLoading && (
         <div>
           {!isHarvestAble ? (
@@ -60,7 +60,10 @@ const HarvestButton = ({
               />
             </>
           ) : (
-            `${formatNumber(formatEther(harvestAmount), 5)} ETHV`
+            `${isHarvested ? 'Harvested' : ''} ${formatNumber(
+              formatEther(harvestAmount),
+              5
+            )} STRK`
           )}
         </div>
       )}
@@ -69,23 +72,25 @@ const HarvestButton = ({
 }
 
 const IdoHarvest = () => {
-  const idoHarvestInfoPeriods = useReadIdoHarvestPerPeriod()
+  const { data: idoHarvestInfoPeriods, isLoading } =
+    useReadIdoHarvestPerPeriod()
 
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
-      {idoHarvestInfoPeriods?.length
-        ? idoHarvestInfoPeriods?.map((period, index) => {
-            return (
-              <HarvestButton
-                key={index}
-                phaseNumber={index}
-                harvestAmount={period?.harvestAmount}
-                harvestTimestamp={period?.harvestTimestamp}
-                isHarvested={period?.isHarvested}
-              />
-            )
-          })
-        : null}
+      {!isLoading &&
+        (idoHarvestInfoPeriods?.length
+          ? idoHarvestInfoPeriods?.map((period, index) => {
+              return (
+                <HarvestButton
+                  key={index}
+                  phaseNumber={index}
+                  harvestAmount={period?.harvestAmount}
+                  harvestTimestamp={period?.harvestTimestamp}
+                  isHarvested={period?.isHarvested}
+                />
+              )
+            })
+          : null)}
     </div>
   )
 }

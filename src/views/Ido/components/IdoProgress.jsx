@@ -1,11 +1,10 @@
-
 import { formatNumber } from '@/utils'
 import { Progress } from '@nextui-org/react'
 import React from 'react'
 import { formatEther, formatGwei } from 'viem'
 
 const IdoProgress = ({ totalAmount, raisingAmount, symbol }) => {
-  const percent = (totalAmount / +raisingAmount || 1) * 100
+  const percent = (totalAmount / (+raisingAmount || 1)) * 100
 
   return (
     <div>
