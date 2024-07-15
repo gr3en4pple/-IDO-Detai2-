@@ -40,13 +40,6 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase }) => {
   // so luong da deposit
   const depositedAmount = personalInfo?.userInfo?.result?.toString() || 0
 
-  // // token harvest available trong thoi diem hien tai
-  // const userCurrentTokenHarvestAvailable =
-  //   personalInfo?.userTokenStatus?.result?.[0]?.toString() || 0
-  // // token da harvest trong qua khu
-  // const userTokenHarvestVested =
-  //   personalInfo?.userTokenStatus?.result?.[1]?.toString() || 0
-
   // // tong so luong token co the harvest
   // const userTotalTokenHarvestAvailable =
   //   personalInfo?.getOfferingAmount?.result?.toString() || 0

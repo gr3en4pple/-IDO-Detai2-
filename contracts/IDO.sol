@@ -833,7 +833,7 @@ contract IDOPublic is ReentrancyGuard, Initializable {
     }
 
     function setRaisingAmount(uint256 _raisingAmount) public onlyOwner {
-        require(block.number < startTime, "cannot update during active ido");
+        require(block.timestamp < startTime, "cannot update during active ido");
         raisingAmount = _raisingAmount;
     }
 
@@ -919,10 +919,6 @@ contract IDOPublic is ReentrancyGuard, Initializable {
         return userInfo[_user].claimed[harvestPeriod];
     }
 
-    function getTotalStakeTokenBalance() public view returns (uint256) {
-        return totalAmount;
-    }
-
     /// @notice Calculate a user's offering amount to be received by multiplying the offering amount by
     ///  the user allocation percentage.
     /// @dev User allocation is scaled up by the ALLOCATION_PRECISION which is scaled down before returning a value.
@@ -944,48 +940,6 @@ contract IDOPublic is ReentrancyGuard, Initializable {
             //  18% linear for 5 months
             return (getOfferingAmount(_user) * 90 / 5) / 100;
         }
-    }
-
-    /// @notice Get the amount of tokens a user is eligible to receive based on current state.
-    /// @param _user address of user to obtain token status
-    function userTokenStatus(address _user)
-        public
-        view
-        returns (uint256 offeringTokenHarvest, uint256 offeringTokensVested)
-    {
-        uint256 currentTime = block.timestamp;
-        if (currentTime < endTime) {
-            return (0, 0);
-        }
-
-        for (uint256 i = 0; i < HARVEST_PERIODS; i++) {
-            if (
-                currentTime >= harvestReleaseTimestamps[i] &&
-                !userInfo[_user].claimed[i]
-            ) {
-                // If offering tokens are available for harvest AND user has not claimed yet
-                offeringTokenHarvest += getOfferingAmountPerPeriod(_user, i);
-            } else if (currentTime < harvestReleaseTimestamps[i]) {
-                // If harvest period is in the future
-                offeringTokensVested += getOfferingAmountPerPeriod(_user, i);
-            }
-        }
-
-        return (offeringTokenHarvest, offeringTokensVested);
-    }
-
-    /// @notice Internal function to handle stake token transfers. Depending on the stake
-    ///   token type, this can transfer ERC-20 tokens or native EVM tokens.
-    /// @param _to address to send stake token to
-    /// @param _amount value of reward token to transfer
-    function safeTransferStakeInternal(address _to, uint256 _amount) internal {
-        require(
-            _amount <= getTotalStakeTokenBalance(),
-            "not enough stake token"
-        );
-
-        // Transfer ERC20 to address
-        IERC20(raisingToken).safeTransfer(_to, _amount);
     }
 
     modifier onlyOwner() {

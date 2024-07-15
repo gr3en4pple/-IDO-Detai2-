@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 *.lock
+
+.firebase/*
+.firebaserc
+firebase.json

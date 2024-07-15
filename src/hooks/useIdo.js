@@ -26,11 +26,7 @@ const IDOPoolInfo = [
   'startClaimingTime'
 ]
 
-const IDOPersonalInfoFunctions = [
-  'getOfferingAmount',
-  'userInfo',
-  'userTokenStatus'
-]
+const IDOPersonalInfoFunctions = ['getOfferingAmount', 'userInfo']
 
 const IDOContracts = {
   abi: IDOAbi,
