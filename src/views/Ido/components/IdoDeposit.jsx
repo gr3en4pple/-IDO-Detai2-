@@ -120,7 +120,7 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
           <div className="flex items-center space-x-1">
             <span>Available: </span>
             <span className="text-sm font-medium text-default-500">
-              {formatNumber(balance)} {symbol}
+              {formatNumber(balance) || 0} {symbol}
             </span>
           </div>
 

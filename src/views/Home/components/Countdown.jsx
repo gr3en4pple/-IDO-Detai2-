@@ -10,9 +10,12 @@ const Countdown = memo(({ endTime, onEnded }) => {
     }
   }, [countdown.isEnded])
 
-  return `${countdown.days > 0 ? `${countdown.days} d ` : ''}${
-    countdown.hours > 0 ? `${countdown.hours}:` : ''
-  }${countdown?.minutes}:${countdown?.seconds}`
+  return (
+    endTime * 1000 > new Date().getTime() &&
+    `${countdown.days > 0 ? `${countdown.days} d ` : ''}${
+      countdown.hours > 0 ? `${countdown.hours}:` : ''
+    }${countdown?.minutes}:${countdown?.seconds}`
+  )
 })
 
 export default Countdown

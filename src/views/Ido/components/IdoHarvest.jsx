@@ -54,10 +54,10 @@ const HarvestButton = ({
           {!isHarvestAble ? (
             <>
               Harvest in{' '}
-              <Countdown
-                onEnded={() => setHarvestAble(true)}
-                endTime={+harvestTimestamp?.toString()}
-              />
+                <Countdown
+                  onEnded={() => setHarvestAble(true)}
+                  endTime={+harvestTimestamp?.toString()}
+                />
             </>
           ) : (
             `${isHarvested ? 'Harvested' : ''} ${formatNumber(
