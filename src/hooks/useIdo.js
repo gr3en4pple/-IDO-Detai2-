@@ -13,7 +13,10 @@ const IDOGeneralInfoFunctions = [
   'startTime',
   'endTime',
   'raisingAmount',
-  'totalAmount'
+  'totalAmount',
+  'allocationLimit',
+  'raisingToken',
+  'raisingAmount'
 ]
 const IDOPoolInfo = [
   'raisingToken',
@@ -26,14 +29,18 @@ const IDOPoolInfo = [
   'startClaimingTime'
 ]
 
-const IDOPersonalInfoFunctions = ['getOfferingAmount', 'userInfo']
+const IDOPersonalInfoFunctions = [
+  'getOfferingAmount',
+  'userInfo',
+  'isWhitelist'
+]
 
 const IDOContracts = {
   abi: IDOAbi,
   address: Addresses.IDO
 }
 
-const useWriteIDOContract = () => {
+const useWriteIDOContract = (idoAddress) => {
   const { isPending, writeContractAsync, data: txHash } = useWriteContract()
 
   const txReceipt = useTransactionReceipt({
@@ -46,7 +53,8 @@ const useWriteIDOContract = () => {
 
   const writeIdoContract = async (args, fnName) => {
     return await writeContractAsync({
-      ...IDOContracts,
+      abi: IDOAbi,
+      address: idoAddress,
       functionName: fnName,
       args: [...args]
     })
@@ -58,10 +66,11 @@ const useWriteIDOContract = () => {
   }
 }
 
-const useIdoContractInfo = () => {
+const useIdoContractInfo = (idoAddress) => {
   const dataRead = useReadContracts({
     contracts: IDOGeneralInfoFunctions.map((fn) => ({
-      ...IDOContracts,
+      abi: IDOAbi,
+      address: idoAddress,
       functionName: fn,
       args: []
     }))
@@ -88,10 +97,11 @@ const useIdoContractInfo = () => {
   }
 }
 
-const useReaIdoPoolInfo = () => {
+const useReaIdoPoolInfo = (idoAddress) => {
   const dataRead = useReadContracts({
     contracts: IDOPoolInfo.map((fn) => ({
-      ...IDOContracts,
+      abi: IDOAbi,
+      address: idoAddress,
       functionName: fn,
       args: []
     }))
@@ -114,12 +124,13 @@ const useReaIdoPoolInfo = () => {
       )
 }
 
-const useReadIdoPersonalInfo = () => {
+const useReadIdoPersonalInfo = (idoAddress) => {
   const { address } = useAccount()
 
   const dataRead = useReadContracts({
     contracts: IDOPersonalInfoFunctions.map((fn) => ({
-      ...IDOContracts,
+      abi: IDOAbi,
+      address: idoAddress,
       functionName: fn,
       args: [address]
     }))
@@ -142,23 +153,26 @@ const useReadIdoPersonalInfo = () => {
       )
 }
 
-const useReadIdoHarvestPerPeriod = () => {
+const useReadIdoHarvestPerPeriod = (idoAddress) => {
   const { address } = useAccount()
 
   const dataRead = useReadContracts({
     contracts: [
       ...IDO_HARVEST_PERIODS.map((period) => ({
-        ...IDOContracts,
+        abi: IDOAbi,
+        address: idoAddress,
         functionName: 'getOfferingAmountPerPeriod',
         args: [address, period]
       })),
       ...IDO_HARVEST_PERIODS.map((period) => ({
-        ...IDOContracts,
+        abi: IDOAbi,
+        address: idoAddress,
         functionName: 'harvestReleaseTimestamps',
         args: [period]
       })),
       ...IDO_HARVEST_PERIODS.map((period) => ({
-        ...IDOContracts,
+        abi: IDOAbi,
+        address: idoAddress,
         functionName: 'hasHarvested',
         args: [address, period]
       }))

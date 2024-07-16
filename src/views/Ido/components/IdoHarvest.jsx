@@ -54,10 +54,10 @@ const HarvestButton = ({
           {!isHarvestAble ? (
             <>
               Harvest in{' '}
-                <Countdown
-                  onEnded={() => setHarvestAble(true)}
-                  endTime={+harvestTimestamp?.toString()}
-                />
+              <Countdown
+                onEnded={() => setHarvestAble(true)}
+                endTime={+harvestTimestamp?.toString()}
+              />
             </>
           ) : (
             `${isHarvested ? 'Harvested' : ''} ${formatNumber(
@@ -71,9 +71,9 @@ const HarvestButton = ({
   )
 }
 
-const IdoHarvest = () => {
+const IdoHarvest = ({ idoAddress }) => {
   const { data: idoHarvestInfoPeriods, isLoading } =
-    useReadIdoHarvestPerPeriod()
+    useReadIdoHarvestPerPeriod(idoAddress)
 
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">

@@ -33,13 +33,13 @@ export const useTokenBalance = (tokenAddress) => {
   return !balance?.data ? 0 : formatEther(balance.data.toString())
 }
 
-export const useIsApproved = (tokenAddress) => {
+export const useIsApproved = ({ tokenAddress, spender }) => {
   const account = useAccount()
   const { data: allowance, isLoading } = useReadContract({
     address: tokenAddress,
     abi: erc20Abi,
     functionName: 'allowance',
-    args: [account.address, addresses.IDO],
+    args: [account.address, spender],
     query: {
       enabled: Boolean(account.address)
     }
@@ -82,7 +82,7 @@ const useToken = (tokenAddress) => {
       }
 }
 
-export const useApproveIdo = (tokenAddress) => {
+export const useApprove = ({ tokenAddress, spender }) => {
   const { isPending, writeContractAsync, data: txHash } = useWriteContract()
 
   const txReceipt = useTransactionReceipt({
@@ -98,7 +98,7 @@ export const useApproveIdo = (tokenAddress) => {
       address: tokenAddress,
       abi: erc20Abi,
       functionName: 'approve',
-      args: [addresses.IDO, parseEther(maxInt96.toString())]
+      args: [spender, parseEther(maxInt96.toString())]
     })
   }
 

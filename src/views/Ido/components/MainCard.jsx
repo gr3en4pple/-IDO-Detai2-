@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Card, CardBody, CardFooter, Image, Input } from '@nextui-org/react'
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  Chip,
+  Image,
+  Input
+} from '@nextui-org/react'
 import IdoProgress from './IdoProgress'
 import { useIdoContractInfo } from '@/hooks/useIdo'
 import { useAccount } from 'wagmi'
@@ -10,20 +17,32 @@ import addresses from '@/contracts/addresses'
 import { formatEther } from 'viem'
 import IdoTimeProgress from './IdoTimeProgress'
 import { IDOPhase } from '@/const'
+import Community from '@/assets/Community'
+import IdoImage from '@/components/IdoImage'
 
-const MainCard = () => {
-  const { data: progressInfo, isLoading } = useIdoContractInfo()
+const MainCard = ({ contract_address, isPrivate }) => {
+  const { isConnected, chainId } = useAccount()
+
+  const { data: idoGeneralInfo, isLoading } =
+    useIdoContractInfo(contract_address)
 
   const [idoPhase, setIdoPhase] = useState(IDOPhase.NOT_STARTED)
 
-  const { isConnected, chainId } = useAccount()
+  const offeringTokenAddress =
+    idoGeneralInfo?.offeringToken?.result?.toString() || null
+  const raisingTokenAddress =
+    idoGeneralInfo?.raisingToken?.result?.toString() || null
 
-  const totalAmount = progressInfo?.totalAmount?.result?.toString() || 0
-  const raisingAmount = progressInfo?.raisingAmount?.result?.toString() || 0
-  const startTime = +progressInfo?.startTime?.result?.toString() || 0
-  const endTime = +progressInfo?.endTime?.result?.toString() || 0
+  const totalAmount = idoGeneralInfo?.totalAmount?.result?.toString() || 0
+  const raisingAmount = idoGeneralInfo?.raisingAmount?.result?.toString() || 0
+  const startTime = +idoGeneralInfo?.startTime?.result?.toString() || 0
+  const endTime = +idoGeneralInfo?.endTime?.result?.toString() || 0
   const isIdoStarted = startTime < new Date().getTime() / 1000
   const isIdoEnded = endTime < new Date().getTime() / 1000
+
+  const allocationLimit = formatEther(
+    (idoGeneralInfo?.allocationLimit?.result?.toString() || 0) + ''
+  )
 
   useEffect(() => {
     if (!isLoading) {
@@ -32,7 +51,7 @@ const MainCard = () => {
     }
   }, [isIdoStarted, isIdoEnded, isLoading])
 
-  const token = useToken(addresses.VNDT)
+  const raisingToken = useToken(raisingTokenAddress)
 
   const leftOverAmount = useMemo(
     () => formatEther(raisingAmount) - formatEther(totalAmount),
@@ -63,21 +82,19 @@ const MainCard = () => {
               </p>
             </div>
 
-            {/* {!isLoading && idoPhase !== IDOPhase.ENDED && ( */}
             <IdoTimeProgress
               endTime={endTime}
               startTime={startTime}
               onCountdownCompleteHandler={onCountdownCompleteHandler}
               idoPhase={idoPhase}
             />
-            {/* // )} */}
 
             {!isLoading &&
               (idoPhase !== IDOPhase.NOT_STARTED ? (
                 <IdoProgress
                   totalAmount={totalAmount}
                   raisingAmount={raisingAmount}
-                  symbol={token?.symbol}
+                  symbol={raisingToken?.symbol}
                 />
               ) : (
                 <div className="h-14" />
@@ -85,27 +102,14 @@ const MainCard = () => {
           </div>
 
           <div className="w-1/2 ">
-            <div className="relative">
-              <Image
-                shadow="sm"
-                radius="lg"
-                width="100%"
-                alt={'stark'}
-                className="object-cover w-full h-full"
-                src={
-                  'https://cdn.coin68.com/images/20231206103714-2b8f1075-2f34-4800-afc0-0da6733b1f9b-128.jpg'
-                }
+            <div>
+              <IdoImage
+                isSoldout={!isLoading && !leftOverAmount}
+                isPrivate={isPrivate}
+                className="h-full"
               />
-
-              {!isLoading && !leftOverAmount && (
-                <div className="absolute left-0 z-10 -translate-y-1/2 top-1/2">
-                  <Image
-                    src="https://winery.finance/images/soldout1.png"
-                    alt="soldout"
-                  />
-                </div>
-              )}
             </div>
+
             <div className="mt-10">
               {!isConnected && (
                 <ConnectWalletButton
@@ -123,9 +127,14 @@ const MainCard = () => {
                   />
                 ) : (
                   <IdoDeposit
+                    isPrivate={isPrivate}
+                    idoAddress={contract_address}
                     leftOverAmount={leftOverAmount}
-                    symbol={token?.symbol}
+                    symbol={raisingToken?.symbol}
                     idoPhase={idoPhase}
+                    allocationLimit={allocationLimit}
+                    raisingToken={raisingTokenAddress}
+                    offeringToken={offeringTokenAddress}
                   />
                 ))}
             </div>

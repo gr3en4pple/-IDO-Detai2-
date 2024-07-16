@@ -1,29 +1,40 @@
 import addresses from '@/contracts/addresses'
 import { useReadIdoPersonalInfo, useWriteIDOContract } from '@/hooks/useIdo'
-import { useApproveIdo, useIsApproved, useTokenBalance } from '@/hooks/useToken'
+import { useApprove, useIsApproved, useTokenBalance } from '@/hooks/useToken'
 import { formatNumber } from '@/utils'
 import { Button, Input } from '@nextui-org/react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { parseEther, formatEther } from 'viem'
+import { parseEther, formatEther, maxInt104 } from 'viem'
 import IdoHarvest from './IdoHarvest'
 import { IDOPhase } from '@/const'
 import { queryClient } from '@/Web3Provider'
 import { toast } from 'sonner'
 
-const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
-  const { writeIdoContract, isLoading, txReceipt } = useWriteIDOContract()
-  const personalInfo = useReadIdoPersonalInfo()
+const IdoDeposit = ({
+  idoAddress,
+  symbol,
+  leftOverAmount,
+  idoPhase,
+  raisingToken,
+  offeringToken,
+  isPrivate,
+  allocationLimit
+}) => {
+  const { writeIdoContract, isLoading, txReceipt } =
+    useWriteIDOContract(idoAddress)
+  const personalInfo = useReadIdoPersonalInfo(idoAddress)
 
-  const { isLoading: isCheckingApproved, isApproved } = useIsApproved(
-    addresses.VNDT
-  )
+  const { isLoading: isCheckingApproved, isApproved } = useIsApproved({
+    tokenAddress: addresses.VNDT,
+    spender: idoAddress
+  })
   const isNotApproved = !isCheckingApproved && !isApproved
 
   const {
     approve,
     isLoading: isApproving,
     txReceipt: approveTxReceipt
-  } = useApproveIdo(addresses.VNDT)
+  } = useApprove({ tokenAddress: addresses.VNDT, spender: idoAddress })
 
   const [amount, setAmount] = useState('')
   const amountRef = useRef(amount)
@@ -65,16 +76,27 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
   const isIdoEnded = idoPhase === IDOPhase.ENDED
 
   // so luong da deposit
-  const depositedAmount = personalInfo?.userInfo?.result?.toString() || 0
+  const userDepositedAmount = personalInfo?.userInfo?.result?.toString() || 0
+
+  const isWhiteListed =
+    !isPrivate || (isPrivate && personalInfo?.isWhitelist?.result)
 
   // // tong so luong token co the harvest
   // const userTotalTokenHarvestAvailable =
   //   personalInfo?.getOfferingAmount?.result?.toString() || 0
 
-  const balance = useTokenBalance(addresses.VNDT)
-  const offeringTokenBalance = useTokenBalance(addresses.STRK)
+  const balance = useTokenBalance(raisingToken)
+  const offeringTokenBalance = useTokenBalance(offeringToken)
 
-  const maxAmount = Math.min(+balance, +leftOverAmount)
+  const isInfinityAllocation = !+allocationLimit
+
+  const maxAmount = Math.min(
+    +balance,
+    isInfinityAllocation
+      ? Number.MAX_SAFE_INTEGER
+      : +allocationLimit - formatEther(userDepositedAmount),
+    +leftOverAmount
+  )
 
   const onMaxHandler = () => {
     setAmount(maxAmount)
@@ -101,6 +123,13 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
     let isValid = true,
       msg = ''
 
+    if (!maxAmount) {
+      return {
+        isValid: false,
+        msg: 'You have reached the limit deposit amount'
+      }
+    }
+
     if (+amount > maxAmount) {
       isValid = false
       msg = `Amount must not greater than ${formatNumber(maxAmount)}`
@@ -110,8 +139,13 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
       msg = 'The IDO sale reached the raising amount goal'
     }
 
+    if (!isWhiteListed) {
+      isValid = false
+      msg = 'User is not whitelisted!'
+    }
+
     return { isValid, msg }
-  }, [amount, maxAmount])
+  }, [amount, maxAmount, isWhiteListed])
 
   return (
     <div className="">
@@ -119,27 +153,37 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
         <div className="flex items-center justify-between mb-3 text-xs text-foreground/60 ">
           <div className="flex items-center space-x-1">
             <span>Available: </span>
-            <span className="text-sm font-medium text-default-500">
+            <span className=" text-default-500">
               {formatNumber(balance) || 0} {symbol}
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-1">
+            <span>Maximum deposit: </span>
+            <span className=" text-default-500">
+              {+allocationLimit === 0
+                ? '∞'
+                : formatNumber(allocationLimit) || 0}{' '}
+              {symbol}
             </span>
           </div>
 
           <div className="flex items-center space-x-1 ">
             <span>Deposited amount:</span>
-            <span className="text-sm font-medium text-default-500">
-              {formatNumber(formatEther(depositedAmount))} {symbol}
+            <span className=" text-default-500">
+              {formatNumber(formatEther(userDepositedAmount))} {symbol}
             </span>
           </div>
         </div>
         {isIdoEnded ? (
           <div className="space-y-4 ">
-            {+depositedAmount === 0 ? (
-              <div className="text-medium text-center text-red-500 font-lg">
+            {+userDepositedAmount === 0 ? (
+              <div className="text-center text-red-500 text-medium font-lg">
                 You did not participated in the IDO Sale
               </div>
             ) : (
               <>
-                <IdoHarvest />
+                <IdoHarvest idoAddress={idoAddress} />
 
                 <div className="flex items-center space-x-1 ">
                   <span>STRK balance:</span>
@@ -177,7 +221,7 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
             <Button
               isLoading={isLoading || isCheckingApproved || isApproving}
               isDisabled={
-                !isIdoStarted ||
+                !isWhiteListed ||
                 (!isNotApproved &&
                   (!amount || +amount > +balance || +amount > maxAmount))
               }

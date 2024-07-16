@@ -5,8 +5,8 @@ import { queryClient } from '@/Web3Provider'
 import React, { useEffect } from 'react'
 import { formatEther } from 'viem'
 
-const IdoInformation = () => {
-  const data = useReaIdoPoolInfo()
+const IdoInformation = ({ contract_address }) => {
+  const data = useReaIdoPoolInfo(contract_address)
 
   const startTime = +data?.startTime?.result?.toString() || 0
   const endTime = +data?.endTime?.result?.toString() || 0
