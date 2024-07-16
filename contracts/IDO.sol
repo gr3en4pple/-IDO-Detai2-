@@ -677,13 +677,19 @@ pragma solidity ^0.8.6;
  * GitHub:          https://github.com/ApeSwapFinance
  */
 
+interface StakingContract {
+    function isStaked(address addr) external view returns (bool);
+}
+
 contract IDOPublic is ReentrancyGuard, Initializable {
     using SafeERC20 for IERC20;
+    
 
     uint256 public constant HARVEST_PERIODS = 6;
 
     uint256[HARVEST_PERIODS] public harvestReleaseTimestamps;
 
+    StakingContract public staking;
     // Info of each user.
     struct UserInfo {
         uint256 amount; // How many tokens the user has provided.
@@ -692,7 +698,7 @@ contract IDOPublic is ReentrancyGuard, Initializable {
 
     address public owner;
 
-    mapping(address => bool) public registers;
+    // whitelist users only
     mapping(address => bool) public whitelist;
 
     // Allocation amount;
@@ -724,6 +730,7 @@ contract IDOPublic is ReentrancyGuard, Initializable {
     event Harvest(address indexed user, uint256 offeringAmount);
 
     function initialize(
+        StakingContract _stakingContract,
         IERC20 _raisingToken,
         uint256 _raisingAmount,
         IERC20 _offeringToken,
@@ -737,6 +744,8 @@ contract IDOPublic is ReentrancyGuard, Initializable {
         uint256 _allocationLimit
     ) external initializer {
         owner = msg.sender;
+
+        staking = _stakingContract;
 
         raisingToken = _raisingToken;
         raisingAmount = _raisingAmount;
@@ -817,11 +826,6 @@ contract IDOPublic is ReentrancyGuard, Initializable {
         allocationLimit = _allocationLimit;
     }
 
-    // Check is registered.
-    function isRegistered(address _user) public view returns (bool) {
-        return registers[_user];
-    }
-
     // Check is whitelist.
     function isWhitelist(address _user) public view returns (bool) {
         return whitelist[_user];
@@ -852,7 +856,7 @@ contract IDOPublic is ReentrancyGuard, Initializable {
     }
 
     /// @dev Deposit ERC20 tokens with support for reflect tokens
-    function deposit(uint256 _amount) external nonReentrant onlyActiveIDO {
+    function deposit(uint256 _amount) external nonReentrant onlyActiveIDO onlyStaker {
         require(_amount > 0, "_amount not > 0");
 
         require(
@@ -883,7 +887,7 @@ contract IDOPublic is ReentrancyGuard, Initializable {
         emit Deposit(msg.sender, _amount);
     }
 
-    function harvest(uint256 harvestPeriod) external nonReentrant {
+    function harvest(uint256 harvestPeriod) external nonReentrant onlyStaker {
         require(harvestPeriod < HARVEST_PERIODS, "harvest period out of range");
         require(
             block.timestamp > harvestReleaseTimestamps[harvestPeriod],
@@ -944,6 +948,11 @@ contract IDOPublic is ReentrancyGuard, Initializable {
 
     modifier onlyOwner() {
         require(msg.sender == owner, "caller is not admin");
+        _;
+    }
+
+    modifier onlyStaker() {
+        require(staking.isStaked(msg.sender) , "caller has not staked");
         _;
     }
 

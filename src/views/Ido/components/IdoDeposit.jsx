@@ -145,7 +145,9 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
           <div className="space-y-4">
             <Input
               pattern="^-?[0-9]\d*\d*$"
-              isDisabled={!isIdoStarted || isLoading || isNotApproved || !leftOverAmount}
+              isDisabled={
+                !isIdoStarted || isLoading || isNotApproved || !leftOverAmount
+              }
               placeholder="Input your deposit amount"
               label={`Deposit ${symbol}`}
               value={amount}
@@ -166,8 +168,9 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
             <Button
               isLoading={isLoading || isCheckingApproved || isApproving}
               isDisabled={
-                !isNotApproved &&
-                (!amount || +amount > +balance || +amount > maxAmount)
+                !isIdoStarted ||
+                (!isNotApproved &&
+                  (!amount || +amount > +balance || +amount > maxAmount))
               }
               onClick={() => (isNotApproved ? onApprove() : onDepositHandler())}
               color="primary"
