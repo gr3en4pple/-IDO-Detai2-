@@ -133,13 +133,22 @@ const IdoDeposit = ({ symbol, leftOverAmount, idoPhase, raisingToken }) => {
         </div>
         {isIdoEnded ? (
           <div className="space-y-4 ">
-            <IdoHarvest />
-            <div className="flex items-center space-x-1 ">
-              <span>STRK balance:</span>
-              <span className="text-sm font-medium text-default-500">
-                {formatNumber(offeringTokenBalance)} STRK
-              </span>
-            </div>
+            {+depositedAmount === 0 ? (
+              <div className="text-medium text-center text-red-500 font-lg">
+                You did not participated in the IDO Sale
+              </div>
+            ) : (
+              <>
+                <IdoHarvest />
+
+                <div className="flex items-center space-x-1 ">
+                  <span>STRK balance:</span>
+                  <span className="text-sm font-medium text-default-500">
+                    {formatNumber(offeringTokenBalance)} STRK
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
