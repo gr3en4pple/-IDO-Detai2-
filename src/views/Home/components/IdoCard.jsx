@@ -76,8 +76,15 @@ const IdoCard = ({ contract_address, name, isPrivate }) => {
             <div>
               <Chip
                 color={
-                  isIdoEnded ? 'default' : isIdoStarted ? 'primary' : 'default'
+                  isIdoEnded
+                    ? 'default'
+                    : isIdoStarted
+                    ? isPrivate
+                      ? 'secondary'
+                      : 'primary'
+                    : 'default'
                 }
+                variant="shadow"
                 size="lg"
                 startContent={
                   !isIdoEnded && (
