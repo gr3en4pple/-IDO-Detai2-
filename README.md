@@ -42,7 +42,7 @@ IDO là một hình thức kêu gọi vốn sử dụng blockchain để tăng t
 
 ## Techstack: React + Vite + NextUI + Wagmi + Connectkit
 
-Giao diện client được viết bằng thư viện <bold>React</bold> kết hợp với <bold>Vite</bold> build tool.
-<bold>NextUI</bold> là một thư viện với các component UI đã được tạo sẵn
-<bold>Wagmi</bold> là thư viện với các hooks và function giúp client giao tiếp với Blockchain chạy <bold>Smart Contract</bold>, nhờ đó có thể gọi các hàm Read và Write lên các <bold>Smart Contract</bold> đó.
-<bold>Connectkit</bold> là thư viện UI với các components giúp client <bold>Connect Ví</bold> với đa dạng các loại ví như Metamask, Okx Wallet, WalletConnect...
+Giao diện client được viết bằng thư viện <b>React</b> kết hợp với <b>Vite</b> build tool.
+<b>NextUI</b> là một thư viện với các component UI đã được tạo sẵn
+<b>Wagmi</b> là thư viện với các hooks và function giúp client giao tiếp với Blockchain chạy <b>Smart Contract</b>, nhờ đó có thể gọi các hàm Read và Write lên các <b>Smart Contract</b> đó.
+<b>Connectkit</b> là thư viện UI với các components giúp client <b>Connect Ví</b> với đa dạng các loại ví như Metamask, Okx Wallet, WalletConnect...
