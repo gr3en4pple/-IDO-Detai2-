@@ -141,7 +141,7 @@ const IdoDeposit = ({
 
     if (!isWhiteListed) {
       isValid = false
-      msg = 'User is not whitelisted!'
+      msg = 'Account is not whitelisted!'
     }
 
     return { isValid, msg }
@@ -225,7 +225,7 @@ const IdoDeposit = ({
                 (!isNotApproved &&
                   (!amount || +amount > +balance || +amount > maxAmount))
               }
-              onClick={() => (isNotApproved ? onApprove() : onDepositHandler())}
+              onClick={isNotApproved ? onApprove : onDepositHandler}
               color="primary"
               fullWidth
             >
