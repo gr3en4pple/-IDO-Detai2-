@@ -5,6 +5,17 @@
 Production: [url](https://ido-detai-2.web.app/)
 link demo: [url](https://www.youtube.com/watch?v=od9XtIKv0sk)
 
+## Danh sách thành viên
+20120467 - Nguyễn Phước Hải
+<br/>
+20120472 - Thái Ngọc Vinh Hiển
+<br/>
+20120068 - Phan Duy
+<br/>
+1712405 - Nguyễn Trường Giang
+<br/>
+
+
 ## Cài đặt
 
 Sử dụng node v18 trở lên
@@ -65,4 +76,4 @@ IDO là một hình thức kêu gọi vốn sử dụng blockchain để tăng t
 ## Tài liệu tham khảo:
 
 Smart Contract: [apeswap](https://github.com/apeswapfinance)
-IDO UI: [winery]https://winery.finance/ido
+IDO UI: [winery](https://winery.finance/ido)
