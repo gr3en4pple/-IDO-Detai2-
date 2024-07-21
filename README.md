@@ -60,4 +60,9 @@ IDO là một hình thức kêu gọi vốn sử dụng blockchain để tăng t
   <b>Connect Ví</b> với đa dạng các loại ví như Metamask, Okx Wallet,
   WalletConnect...
 </p>
-      
+
+
+## Tài liệu tham khảo:
+
+Smart Contract: [apeswap](https://github.com/apeswapfinance)
+IDO UI: [winery]https://winery.finance/ido
