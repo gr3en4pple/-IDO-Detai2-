@@ -80,6 +80,8 @@ Smart Contract: [apeswap](https://github.com/apeswapfinance)
 IDO UI: [winery](https://winery.finance/ido)
 
 ## Địa chỉ smartcontract sử dụng trong đồ án:
+### Tất cả đều sử dụng BSC-Testnet
+
 ```bash
 IDO: '0xC3ed781A3eF8F83641a9431714601bc92Da45156',
 VNDT: '0xDad907B909ccC8F2C806FF91535151F6aDED7dCA',
