@@ -1,4 +1,5 @@
 import { IDO_HARVEST_PERIODS } from '@/const'
+import addresses from '@/contracts/addresses'
 import { useReadIdoHarvestPerPeriod, useWriteIDOContract } from '@/hooks/useIdo'
 import { formatNumber } from '@/utils'
 import Countdown from '@/views/Home/components/Countdown'
@@ -12,11 +13,12 @@ const HarvestButton = ({
   phaseNumber,
   harvestAmount,
   harvestTimestamp,
-  isHarvested
+  isHarvested,
+  idoAddress
 }) => {
   const [isHarvestAble, setHarvestAble] = useState(false)
 
-  const { isLoading, writeIdoContract, txReceipt } = useWriteIDOContract()
+  const { isLoading, writeIdoContract, txReceipt } = useWriteIDOContract(idoAddress)
 
   useEffect(() => {
     if (txReceipt?.data && txReceipt?.data?.status === 'success') {
@@ -87,6 +89,7 @@ const IdoHarvest = ({ idoAddress }) => {
                   harvestAmount={period?.harvestAmount}
                   harvestTimestamp={period?.harvestTimestamp}
                   isHarvested={period?.isHarvested}
+                  idoAddress={idoAddress}
                 />
               )
             })
