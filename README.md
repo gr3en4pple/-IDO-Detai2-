@@ -6,7 +6,18 @@ Production: [url](https://ido-detai-2.web.app/)
 <br/>
 link demo: [url](https://www.youtube.com/watch?v=od9XtIKv0sk)
 
+## Địa chỉ smartcontract sử dụng trong đồ án:
+### Tất cả đều sử dụng BSC-Testnet
+
+```bash
+IDO: '0xC3ed781A3eF8F83641a9431714601bc92Da45156',
+VNDT: '0xDad907B909ccC8F2C806FF91535151F6aDED7dCA',
+STRK: '0x1E2C8B6Bd84B854fb7cCE65121f1F5a9E22C4FCe',
+IDO_PRIVATE: '0xC6Af14b9f314e66aF6CF98Cb34111aF0194BaDda'
+```
+
 ## Danh sách thành viên
+
 20120467 - Nguyễn Phước Hải
 <br/>
 20120472 - Thái Ngọc Vinh Hiển
@@ -15,7 +26,6 @@ link demo: [url](https://www.youtube.com/watch?v=od9XtIKv0sk)
 <br/>
 1712405 - Nguyễn Trường Giang
 <br/>
-
 
 ## Cài đặt
 
@@ -73,18 +83,7 @@ IDO là một hình thức kêu gọi vốn sử dụng blockchain để tăng t
   WalletConnect...
 </p>
 
-
 ## Tài liệu tham khảo:
 
 Smart Contract: [apeswap](https://github.com/apeswapfinance)
 IDO UI: [winery](https://winery.finance/ido)
-
-## Địa chỉ smartcontract sử dụng trong đồ án:
-### Tất cả đều sử dụng BSC-Testnet
-
-```bash
-IDO: '0xC3ed781A3eF8F83641a9431714601bc92Da45156',
-VNDT: '0xDad907B909ccC8F2C806FF91535151F6aDED7dCA',
-STRK: '0x1E2C8B6Bd84B854fb7cCE65121f1F5a9E22C4FCe',
-IDO_PRIVATE: '0xC6Af14b9f314e66aF6CF98Cb34111aF0194BaDda'
-```
