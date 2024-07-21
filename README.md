@@ -3,6 +3,7 @@
 ### Lựa chọn đề tài 2 - Xây dựng hệ thống gọi vốn IDO (Decentralized Crowdfunding)
 
 Production: [url](https://ido-detai-2.web.app/)
+link demo: [url](https://www.youtube.com/watch?v=od9XtIKv0sk)
 
 ## Cài đặt
 
