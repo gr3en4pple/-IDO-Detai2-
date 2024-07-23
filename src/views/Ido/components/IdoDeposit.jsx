@@ -131,17 +131,23 @@ const IdoDeposit = ({
     }
 
     if (+amount > maxAmount) {
-      isValid = false
-      msg = `Amount must not greater than ${formatNumber(maxAmount)}`
+      return {
+        isValid: false,
+        msg: `Amount must not greater than ${formatNumber(maxAmount)}`
+      }
     }
     if (!leftOverAmount) {
-      isValid = false
-      msg = 'The IDO sale reached the raising amount goal'
+      return {
+        isValid: false,
+        msg: 'The IDO sale reached the raising amount goal'
+      }
     }
 
     if (!isWhiteListed) {
-      isValid = false
-      msg = 'Account is not whitelisted!'
+      return {
+        isValid: false,
+        msg: 'Account is not whitelisted!'
+      }
     }
 
     return { isValid, msg }

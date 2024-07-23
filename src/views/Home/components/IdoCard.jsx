@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Card,
@@ -15,11 +15,12 @@ import IdoCountdown from './Countdown'
 import { formatEther } from 'viem'
 import { useIdoContractInfo } from '@/hooks/useIdo'
 import classNames from '@/utils/classnames'
-import Community from '@/assets/Community'
 import IdoImage from '@/components/IdoImage'
+import { IDOPhase } from '@/const'
 
 const IdoCard = ({ contract_address, name, isPrivate }) => {
   const { data: idoInfo, isLoading } = useIdoContractInfo(contract_address)
+  const [idoPhase, setIdoPhase] = useState(IDOPhase.NOT_STARTED)
 
   const startTime = +idoInfo?.startTime?.result?.toString() || 0
   const endTime = +idoInfo?.endTime?.result?.toString() || 0
@@ -32,6 +33,13 @@ const IdoCard = ({ contract_address, name, isPrivate }) => {
     () => formatEther(raisingAmount) - formatEther(totalAmount),
     [raisingAmount, totalAmount]
   )
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isIdoStarted) setIdoPhase(IDOPhase.STARTED)
+      if (isIdoEnded) setIdoPhase(IDOPhase.ENDED)
+    }
+  }, [isIdoStarted, isIdoEnded, isLoading])
 
   return (
     <Card fullWidth shadow="sm">
@@ -76,9 +84,9 @@ const IdoCard = ({ contract_address, name, isPrivate }) => {
             <div>
               <Chip
                 color={
-                  isIdoEnded
+                  idoPhase === IDOPhase.ENDED
                     ? 'default'
-                    : isIdoStarted
+                    : idoPhase === IDOPhase.STARTED
                     ? isPrivate
                       ? 'secondary'
                       : 'primary'
@@ -87,20 +95,23 @@ const IdoCard = ({ contract_address, name, isPrivate }) => {
                 variant="shadow"
                 size="lg"
                 startContent={
-                  !isIdoEnded && (
-                    <span>{isIdoStarted ? 'Ends in' : 'Starts in'}:</span>
+                  idoPhase !== IDOPhase.ENDED && (
+                    <span>
+                      {idoPhase === IDOPhase.STARTED ? 'Ends in' : 'Starts in'}:
+                    </span>
                   )
                 }
               >
-                {startTime &&
-                  endTime &&
-                  (isIdoEnded ? (
-                    'Ended'
-                  ) : (
-                    <IdoCountdown
-                      endTime={isIdoStarted ? endTime : startTime}
-                    />
-                  ))}
+                {isLoading ? null : idoPhase === IDOPhase.ENDED ? (
+                  'Ended'
+                ) : (
+                  <IdoCountdown
+                    endTime={
+                      idoPhase === IDOPhase.STARTED ? endTime : startTime
+                    }
+                    onEnded={() => setIdoPhase(IDOPhase.STARTED)}
+                  />
+                )}
               </Chip>
             </div>
 
